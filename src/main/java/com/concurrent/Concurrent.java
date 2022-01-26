@@ -43,5 +43,8 @@ public class Concurrent {
         Thread main = Thread.currentThread();
         System.out.println("main " + main);
         System.out.println(DateUtil.now() + " main");
+        System.out.println(DateUtil.now() + " main");
+        System.out.println(DateUtil.now() + " main");
+        System.out.println(DateUtil.now() + " main");
     }
 }
