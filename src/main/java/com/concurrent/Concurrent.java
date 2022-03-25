@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 import cn.hutool.core.util.ArrayUtil;
 
+import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,15 +16,12 @@ public class Concurrent {
 
     public static void main(String[] args) throws InterruptedException {
         Runnable runnable = new Runnable() {
-            int x = 1;
-
             @Override
             public void run() {
                 try {
                     Thread t1 = Thread.currentThread();
-                    System.out.println("t1.getStackTrace() " + ArrayUtil.toString(t1.getStackTrace()));
-                    System.out.println(DateUtil.now() + " " + String.format(t1.getName(), this.x));
-                    TimeUnit.SECONDS.sleep(2L);
+                    System.out.println(DateUtil.now() + " " + t1.getName());
+                    TimeUnit.SECONDS.sleep(1L);
                 } catch (InterruptedException var2) {
                     var2.printStackTrace();
                 }
@@ -31,17 +29,20 @@ public class Concurrent {
             }
         };
         // 线程池
-        ThreadFactory namedThreadFactory = (new ThreadFactoryBuilder()).setNamePrefix("demo-pool-%d").build();
+        ThreadFactory namedThreadFactory = (new ThreadFactoryBuilder()).setNamePrefix("demo-pool-").build();
         ExecutorService singleThreadPool = new ThreadPoolExecutor(
-                1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
-        singleThreadPool.execute(runnable);
+                2, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(10), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+        // 15个任务 每个任务耗时1秒 线程池参数 2,5,10 总耗时->3秒
+        for (int i = 0; i < 15; i++) {
+            singleThreadPool.execute(runnable);
+        }
         singleThreadPool.shutdown();
 
-        Thread t1 = new Thread(runnable, "t1");
-        t1.start();
-        t1.join();
-        Thread main = Thread.currentThread();
-        System.out.println("main " + main);
-        System.out.println(DateUtil.now() + " main");
+        // Thread t1 = new Thread(runnable, "t1");
+        // t1.start();
+        // t1.join();
+        // Thread main = Thread.currentThread();
+        // System.out.println("main " + main);
+        // System.out.println(DateUtil.now() + " main");
     }
 }
